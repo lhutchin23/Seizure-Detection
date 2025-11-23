@@ -34,33 +34,38 @@ def dwt_denoising(data, wavelet="sym4", level=None):
         denoised_data = denoised_data[:len(data)]
     return denoised_data
 
-def plot_denoised_spectrogram(data, wavelet="sym4", title="Spectrogram"):
-    if data.ndim > 1:
-        signal = data[0]
-    else:
-        signal = data
-
-    denoised_signal = dwt_denoising(signal, wavelet=wavelet)
-    
+def plot_spectrogram(signal, ax, title, wavelet="morl"):
     scales = np.arange(1, 128)
-    coeffs, freqs = pywt.cwt(denoised_signal, scales, "morl")
+    coeffs, freqs = pywt.cwt(signal, scales, wavelet)
     
-    plt.figure(figsize=(12, 6))
-    plt.imshow(np.abs(coeffs), aspect='auto', cmap='jet', 
+    im = ax.imshow(np.abs(coeffs), aspect='auto', cmap='jet', 
                extent=[0, len(signal), scales[-1], scales[0]])
-    plt.colorbar(label='Magnitude')
-    plt.title(f'Denoised Spectrogram (sym4 denoised) - {title}')
-    plt.xlabel('Time')
-    plt.ylabel('Scale')
-    plt.show()
+    plt.colorbar(im, ax=ax, label='Magnitude')
+    ax.set_title(title)
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Scale')
 
-plot_denoised_spectrogram(SeizureData, title="Seizure Data")
-plot_denoised_spectrogram(NonSeizureData, title="Non-Seizure Data")
+# Prepare signals
+ns_signal = NonSeizureData[0] if NonSeizureData.ndim > 1 else NonSeizureData
+ns_denoised = dwt_denoising(ns_signal)
 
-DenoisedSeizureData = dwt_denoising(SeizureData)
-DenoisedNonSeizureData = dwt_denoising(NonSeizureData)
+s_signal = SeizureData[0] if SeizureData.ndim > 1 else SeizureData
+s_denoised = dwt_denoising(s_signal)
 
+# Plot 4 images side by side
+fig, axes = plt.subplots(1, 4, figsize=(24, 6))
+fig.suptitle("sym4 denoising", fontsize=16)
 
+# Left side: Non-Seizure (Raw, Denoised)
+plot_spectrogram(ns_signal, axes[0], "Raw Non-Seizure")
+plot_spectrogram(ns_denoised, axes[1], "Denoised Non-Seizure (DWT)")
+
+# Right side: Seizure (Raw, Denoised)
+plot_spectrogram(s_signal, axes[2], "Raw Seizure")
+plot_spectrogram(s_denoised, axes[3], "Denoised Seizure (DWT)")
+
+plt.tight_layout()
+plt.show()
 
 
 
