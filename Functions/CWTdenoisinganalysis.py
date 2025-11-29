@@ -51,29 +51,23 @@ def plot_spectrogram(signal, ax, title, wavelet="morl"):
     ax.set_xlabel('Time')
     ax.set_ylabel('Scale')
 
-# Prepare signals
 ns_signal = NonSeizureData[0] if NonSeizureData.ndim > 1 else NonSeizureData
 ns_denoised = cwt_denoising(ns_signal)
 
 s_signal = SeizureData[0] if SeizureData.ndim > 1 else SeizureData
 s_denoised = cwt_denoising(s_signal)
 
-# Plot 4 images side by side
 fig, axes = plt.subplots(1, 4, figsize=(24, 6))
 fig.suptitle("Morlet denoising", fontsize=16)
 
-# Left side: Non-Seizure (Raw, Denoised)
 plot_spectrogram(ns_signal, axes[0], "Raw Non-Seizure")
 plot_spectrogram(ns_denoised, axes[1], "Denoised Non-Seizure")
 
-# Right side: Seizure (Raw, Denoised)
 plot_spectrogram(s_signal, axes[2], "Raw Seizure")
 plot_spectrogram(s_denoised, axes[3], "Denoised Seizure")
 
 plt.tight_layout()
 plt.show()
-
-print ("finished")
 
 
 
