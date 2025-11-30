@@ -75,3 +75,20 @@ def preprocess():
     X_val = normalize.Normalize(X_val)
     X_test = normalize.Normalize(X_test)
     return X_train, Y_train, X_val, Y_val, X_test, Y_test
+
+# split each set into batches of 128
+
+
+def batch_generator (data, batch_size=128): 
+    for i in range(0, len(data), batch_size):
+        yield data[i:i + batch_size]
+
+
+
+        
+    
+
+
+
+
+
