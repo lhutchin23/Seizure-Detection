@@ -1,9 +1,32 @@
 import random
-import normalize
-
-import matplotlib as plt
+import math
 import numpy as np
-import pandas as pd
+
+def Normalize(data):
+    """
+    Takes in a 2D numpy array and returns Z-score normalization using a global mean and std dev.
+    """
+    total_sum = 0
+    num_elements = 0
+    for row in data:
+        total_sum += sum(row)
+        num_elements += len(row)
+    mean = total_sum / num_elements
+
+    variance = 0
+    for row in data:
+        for x in row:
+            variance += (x - mean) ** 2
+    variance /= num_elements
+    std_dev = math.sqrt(variance)
+
+    if std_dev == 0:
+        std_dev = 1 
+
+    normalized_data = [(row - mean) / std_dev for row in data]
+    
+    return normalized_data, mean, std_dev
+
 def preprocess():
     SeizureDataPath = "DATA/seizure.txt"
     NonSeizureDataPath = "DATA/nonseizure.txt"
@@ -14,14 +37,12 @@ def preprocess():
         for line in f:
             lst = list(map(int, line.strip().split(','))) 
             SeizureData.append(lst)
-        f.close()
         
     print("Seizure Loaded \n")
     with open(NonSeizureDataPath, "r") as f:
         for line in f:
             lst = (list(map(int, line.strip().split(','))))
             NonSeizureData.append(lst)
-        f.close()
     print("NonSeizureData Loaded \n")
     
     X = np.vstack([
@@ -70,40 +91,19 @@ def preprocess():
     X_train, Y_train = X[train_indices], Y[train_indices]
     X_val, Y_val = X[val_indices], Y[val_indices]
     X_test, Y_test = X[test_indices], Y[test_indices]
+    
     #Z-score normalization
-    X_train = normalize.Normalize(X_train)
-    X_val = normalize.Normalize(X_val)
-    X_test = normalize.Normalize(X_test)
+    X_train_norm, mean_train, std_train = Normalize(X_train)
+    X_val_norm = [(x - mean_train) / std_train for x in X_val] 
+    X_test_norm = [(x - mean_train) / std_train for x in X_test]
+    
+    X_train = np.array(X_train_norm)
+    X_val = np.array(X_val_norm)
+    X_test = np.array(X_test_norm)
+
     return X_train, Y_train, X_val, Y_val, X_test, Y_test
 
-# split each set into batches of 128
-
-
-def batch_generator (data, batch_size=128): 
-    for i in range(0, len(data), batch_size):
-        yield data[i:i + batch_size]
-
-
-#here, generated batches of 128 for each of the above stratified traning sets.
-
-x_train_batch = batch_generator(X_train, batch_size=128)
-y_train_batch = batch_generator(Y_train, batch_size=128)
-x_val_batch = batch_generator(X_val, batch_size=128)
-y_val_batch = batch_generator(Y_val, batch_size=128)
-x_test_batch = batch_generator(X_test, batch_size=128)
-y_test_batch = batch_generator(Y_test, batch_size=128)
-
-
-
-
-
-
-
-
-        
-    
-
-
-
-
-
+if __name__ == "__main__":
+    X_train, Y_train, X_val, Y_val, X_test, Y_test = preprocess()
+    print("Data preprocessed successfully.")
+    print("X_train shape:", X_train.shape)
