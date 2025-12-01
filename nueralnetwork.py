@@ -99,6 +99,23 @@ class fullyConnectedLayer(training_data):
         self.bias -= learning_rate * output_gradient.mean(axis=0, keepdims=True)
 
         return input_gradient
+    
+
+#this is our basic relu activation function 
+
+class relu(): 
+    def __init__(self, input):
+        self.input = input
+    def forward(self, input):
+        self.input = input
+        return np.maximum(0, input)
+    
+    def backward(self, output_gradient, learning_rate):
+        input_gradient = output_gradient.copy()
+        input_gradient[self.input <= 0] = 0
+        return input_gradient
+
+
 
 
 
