@@ -84,6 +84,21 @@ def batch_generator (data, batch_size=128):
         yield data[i:i + batch_size]
 
 
+#here, generated batches of 128 for each of the above stratified traning sets.
+
+x_train_batch = batch_generator(X_train, batch_size=128)
+y_train_batch = batch_generator(Y_train, batch_size=128)
+x_val_batch = batch_generator(X_val, batch_size=128)
+y_val_batch = batch_generator(Y_val, batch_size=128)
+x_test_batch = batch_generator(X_test, batch_size=128)
+y_test_batch = batch_generator(Y_test, batch_size=128)
+
+
+
+
+
+
+
 
         
     

@@ -8,7 +8,6 @@ import dataloader
 from scipy import signal
 
 datas = dataloader.preprocess()
-training_data = dataloader.batch_generator(datas[0], batch_size=128)
 
 
 #80, 10, 10 train, val, test split
@@ -25,11 +24,11 @@ X_train, Y_train, X_val, Y_val, X_test, Y_test = dataloader.preprocess()
 
 
 class convolutionalLayer(training_data):
-    def __init__(self, input_shape, kernal_size, depth):
+    def __init__(self, input_shape, kernal_size, depth, stride):
         input_height, input_width, input_depth = input_shape
         self.depth = depth
         self.input_shape = input_shape
-        self.output_shape = (depth, input_height - kernal_size + 1, input_width - kernal_size + 1)
+        self.output_shape = (depth, (input_height - kernal_size)/stride + 1, (input_width - kernal_size)/stride + 1)
         self.kernal_size = (depth, input_depth, kernal_size, kernal_size)
         self.kernals = np.random.randn(*self.kernal_size) 
         self.bias = np.random.randn(*self.output_shape)
@@ -100,6 +99,9 @@ class fullyConnectedLayer(training_data):
         self.bias -= learning_rate * output_gradient.mean(axis=0, keepdims=True)
 
         return input_gradient
+
+
+
     
 
           
