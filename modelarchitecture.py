@@ -7,23 +7,7 @@ import pandas as pd
 import dataloader
 from scipy import signal
 
-datas = dataloader.preprocess()
-
-
-#80, 10, 10 train, val, test split
-
-X_train = np.array([], dtype=np.float64)
-X_val = np.array([], dtype=np.float64)
-X_test = np.array([], dtype=np.float64)
-Y_train = np.array([], dtype=np.int64)
-Y_val = np.array([], dtype=np.int64)
-Y_test = np.array([], dtype=np.int64)
-
-X_train, Y_train, X_val, Y_val, X_test, Y_test = dataloader.preprocess()
-
-
-
-class convolutionalLayer(training_data):
+class convolutionalLayer():
     def __init__(self, input_shape, kernal_size, depth, stride):
         input_height, input_width, input_depth = input_shape
         self.depth = depth
@@ -38,7 +22,7 @@ class convolutionalLayer(training_data):
             self.output_shape = np.copy(self.bias)
             for i in range(self.depth):
                 for j in range(self.input_shape[2]):
-                    self.output_shape[i] += self.convolve2d(input[j], self.kernals[i][j])
+                    self.output_shape[i] += signal.convolve2d(input[j], self.kernals[i][j])
 
             return self.output
         
@@ -49,8 +33,8 @@ class convolutionalLayer(training_data):
 
             for i in range(self.depth):
                 for j in range(self.input_shape[2]):
-                    kernal_gradient[i][j] += self.convolve2d(self.input[j], output_gradient[i])
-                    input_gradient[j] += self.convolve2d(output_gradient[i], self.kernals[i][j], mode='full')
+                    kernal_gradient[i][j] += signal.convolve2d(self.input[j], output_gradient[i])
+                    input_gradient[j] += signal.convolve2d(output_gradient[i], self.kernals[i][j], mode='full')
 
             self.kernals -= learning_rate * kernal_gradient
             self.bias -= learning_rate * output_gradient
@@ -59,7 +43,7 @@ class convolutionalLayer(training_data):
         #basic convolution layer operation
 
 
-class maxPoolingLayer(training_data):
+class maxPoolingLayer():
     def __init__(self, input_shape, pool_size, stride=2):
         # use stride of 2 for smaller data
         self.input_shape = input_shape
@@ -80,7 +64,7 @@ class maxPoolingLayer(training_data):
         return output
     
 
-class fullyConnectedLayer(training_data):
+class fullyConnectedLayer():
     def __init__(self, input_size, output_size):
         self.input_size = input_size
         self.output_size = output_size
@@ -101,7 +85,6 @@ class fullyConnectedLayer(training_data):
         return input_gradient
     
 
-#this is our basic relu activation function 
 
 class relu(): 
     def __init__(self, input):
