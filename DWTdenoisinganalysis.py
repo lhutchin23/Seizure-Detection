@@ -32,41 +32,44 @@ def dwt_denoising(data, wavelet="sym4", level=None):
     
     if len(denoised_data) > len(data):
         denoised_data = denoised_data[:len(data)]
-    return denoised_data
 
-def plot_spectrogram(signal, ax, title, wavelet="morl"):
-    scales = np.arange(1, 128)
-    coeffs, freqs = pywt.cwt(signal, scales, wavelet)
-    
-    im = ax.imshow(np.abs(coeffs), aspect='auto', cmap='jet', 
-               extent=[0, len(signal), scales[-1], scales[0]])
-    plt.colorbar(im, ax=ax, label='Magnitude')
-    ax.set_title(title)
-    ax.set_xlabel('Time')
-    ax.set_ylabel('Scale')
+    if level is None:
+        level = pywt.dwt_max_level(data.shape[-1], pywt.Wavelet(wavelet).dec_len)
 
-# Prepare signals
-ns_signal = NonSeizureData[0] if NonSeizureData.ndim > 1 else NonSeizureData
-ns_denoised = dwt_denoising(ns_signal)
+    def process_one(signal):
+        # 1. Decompose
+        coeffs = pywt.wavedec(signal, wavelet, level=level)
+        
+        # 2. Denoise (Thresholding Detail Coefficients)
+        # We usually keep the approximation (coeffs[0]) and threshold details (coeffs[1:])
+        sigma = np.median(np.abs(coeffs[-1])) / 0.6745
+        threshold = sigma * np.sqrt(2 * np.log(len(signal)))
+        
+        denoised_coeffs = [coeffs[0]] # Keep approximation
+        for detail in coeffs[1:]:
+            denoised_coeffs.append(pywt.threshold(detail, threshold, mode='soft'))
+            
+        # 3. Resize and Stack to make a 2D Image
+        target_length = len(signal)
+        image_rows = []
+        
+        for c in denoised_coeffs:
+            # Resize to match original signal length
+            c_resized = np.interp(
+                np.linspace(0, 1, target_length),
+                np.linspace(0, 1, len(c)),
+                c
+            )
+            image_rows.append(c_resized)
+            
+        return np.abs(np.vstack(image_rows))
 
-s_signal = SeizureData[0] if SeizureData.ndim > 1 else SeizureData
-s_denoised = dwt_denoising(s_signal)
-
-# Plot 4 images side by side
-fig, axes = plt.subplots(1, 4, figsize=(24, 6))
-fig.suptitle("sym4 denoising", fontsize=16)
-
-# Left side: Non-Seizure (Raw, Denoised)
-plot_spectrogram(ns_signal, axes[0], "Raw Non-Seizure")
-plot_spectrogram(ns_denoised, axes[1], "Denoised Non-Seizure (DWT)")
-
-# Right side: Seizure (Raw, Denoised)
-plot_spectrogram(s_signal, axes[2], "Raw Seizure")
-plot_spectrogram(s_denoised, axes[3], "Denoised Seizure (DWT)")
-
-plt.tight_layout()
-plt.show()
+    if data.ndim == 1:
+        return process_one(data)
+    elif data.ndim == 2:
+        return np.array([process_one(x) for x in data])
 
 
 
+print ("fertig")
 
