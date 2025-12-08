@@ -1,0 +1,6 @@
+First test on binary classificaiton CNN model:
+
+Wavelet decomposition: Uses 5 different thresholds, no denoising, sqrtolog denoising, rigrsure dneoising, heursure denosing,
+and visushrink denoising. 
+
+Conducted at 12/09/25

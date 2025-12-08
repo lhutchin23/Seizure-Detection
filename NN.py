@@ -8,6 +8,7 @@ import model
 import CWTdenoisinganalysis
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
+import os
 
 # Training using GPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -15,17 +16,15 @@ print(f"Training on: {device}")
 
 #using training data, can validate using preprocessed_data[2] and preprocessed_data[3], can test using preprocessed_data[4] and preprocessed_data[5]
 preprocessed_data = dataloader.preprocess()
-X_train_raw, y_raw = preprocessed_data[2], preprocessed_data[3]
+X_train_raw, y_train_raw = preprocessed_data[0], preprocessed_data[1]
+X_test_raw, y_test_raw = preprocessed_data[4], preprocessed_data[5]
 
-if isinstance(y_raw, np.ndarray):
-    y_train = torch.from_numpy(y_raw).long()
-else:
-    y_train = y_raw.long()
 
-if isinstance(X_train_raw, torch.Tensor):
-    X_train = X_train_raw.numpy()
-else:
-    X_train = X_train_raw
+x_train = X_train_raw
+y_train = torch.from_numpy(y_train_raw).long()
+x_test = X_test_raw
+y_test = torch.from_numpy(y_test_raw).long()
+
 
 threshold_names = ['no denoise', 'sqwtolog', 'rigrsure', 'heuresure', 'visushrink']
 results = {}
@@ -40,9 +39,9 @@ for name in threshold_names:
     else:
         t_func = getattr(CWTdenoisinganalysis, name)
 
-    print("Generating scalograms")
+    print("Generating training scalograms")
     scalograms_np = CWTdenoisinganalysis.cwt_denoising(
-        X_train, 
+        x_train, 
         wavelet="morl", 
         threshold_func=t_func, 
         threshold_type='scale_dependent', 
@@ -50,9 +49,21 @@ for name in threshold_names:
     )
 
     scalograms = torch.tensor(scalograms_np, dtype=torch.float32).unsqueeze(1)
-    
-    dataset = TensorDataset(scalograms, y_train)
-    train_loader = DataLoader(dataset, batch_size=32, shuffle=True)
+    train_dataset = TensorDataset(scalograms, y_train)
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+
+    print("Generating testing scalograms")
+    scalograms_np_test = CWTdenoisinganalysis.cwt_denoising(
+        x_test, 
+        wavelet="morl", 
+        threshold_func=t_func, 
+        threshold_type='scale_dependent', 
+        mode='soft'
+    )
+
+    scalograms_test = torch.tensor(scalograms_np_test, dtype=torch.float32).unsqueeze(1)
+    test_dataset = TensorDataset(scalograms_test, y_test)
+    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
   
     cnn = model.EEG_CNN().to(device)
@@ -78,38 +89,37 @@ for name in threshold_names:
             epoch_loss += loss.item()
             
             batch_count += 1
-            if batch_count % 10 == 0:
+            if batch_count % 50 == 0:
                 print(f"  Epoch {epoch+1} | Batch {batch_count} | Loss: {loss.item():.4f}")
 
     cnn.eval()
     all_preds = []
+    all_labels = []
     with torch.no_grad():
-        eval_loader = DataLoader(dataset, batch_size=32, shuffle=False)
-        for batch_X, _ in eval_loader:
+        eval_loader = test_loader
+        for batch_X, batch_y in eval_loader:
             batch_X = batch_X.to(device)
             preds = cnn(batch_X).argmax(dim=1)
             all_preds.extend(preds.cpu().numpy())
+            all_labels.extend(batch_y.cpu().numpy())
+ #my computer training on CPU because it is a potato
             
-    acc = accuracy_score(y_train.cpu().numpy(), all_preds)
+    acc = accuracy_score(y_test.cpu().numpy(), all_preds)
     
     results[name] = acc
     print(f"{name:6} → {acc:.4%}")
 
-#generating confusion matrix after last loop. 
+    #generating confusion matrix for every threshold. 
 
-cnn.eval()
-all_preds = []
-all_labels = []
-with torch.no_grad():
-    for batch_X, batch_y in eval_loader:           
-        preds = cnn(batch_X).argmax(dim=1)
-        all_preds.extend(preds.cpu().numpy())
-        all_labels.extend(batch_y.cpu().numpy())
+    cm = confusion_matrix(all_labels, all_preds)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Normal', 'Seizure'])
+    disp.plot(cmap='Blues', values_format='d')
+    plt.title(f'Confusion Matrix - {name} Denoising')
+    save_path = os.path.join("results_12_09_25", f'confusion_matrix_{name}.png')
+    plt.savefig(save_path, dpi=200, bbox_inches='tight')
+    plt.close()
 
-# Compute and plot
-cm = confusion_matrix(all_labels, all_preds)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Normal', 'Seizure'])
-disp.plot(cmap='Blues', values_format='d')
-plt.title(f'Confusion Matrix - {name} Denoising')
-plt.savefig(f'confusion_matrix_{name}.png', dpi=200, bbox_inches='tight')
-plt.show()
+    
+
+
+
