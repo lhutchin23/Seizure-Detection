@@ -6,7 +6,8 @@ from sklearn.metrics import accuracy_score
 import dataloader
 import model
 import CWTdenoisinganalysis
-import time
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
 
 # Training using GPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -26,7 +27,7 @@ if isinstance(X_train_raw, torch.Tensor):
 else:
     X_train = X_train_raw
 
-threshold_names = ['no denoise', 'sqwtolog', 'rigrsure', 'heuresure']
+threshold_names = ['no denoise', 'sqwtolog', 'rigrsure', 'heuresure', 'visushrink']
 results = {}
 
 print('Data loading finished')
@@ -55,7 +56,7 @@ for name in threshold_names:
 
   
     cnn = model.EEG_CNN().to(device)
-    optimizer = torch.optim.Adam(cnn.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(cnn.parameters(), lr=0.00067)  #previsou runs on 0.001 learning rate showed signs of overshooting, swinging from an error of 0.2 to 0.01. 
     criterion = nn.CrossEntropyLoss()
     
     print("Starting training")
@@ -94,3 +95,21 @@ for name in threshold_names:
     results[name] = acc
     print(f"{name:6} → {acc:.4%}")
 
+#generating confusion matrix after last loop. 
+
+cnn.eval()
+all_preds = []
+all_labels = []
+with torch.no_grad():
+    for batch_X, batch_y in eval_loader:           
+        preds = cnn(batch_X).argmax(dim=1)
+        all_preds.extend(preds.cpu().numpy())
+        all_labels.extend(batch_y.cpu().numpy())
+
+# Compute and plot
+cm = confusion_matrix(all_labels, all_preds)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Normal', 'Seizure'])
+disp.plot(cmap='Blues', values_format='d')
+plt.title(f'Confusion Matrix - {name} Denoising')
+plt.savefig(f'confusion_matrix_{name}.png', dpi=200, bbox_inches='tight')
+plt.show()

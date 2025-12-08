@@ -2,6 +2,7 @@ import numpy as np
 import pywt
 import matplotlib.pyplot as plt
 
+
 '''
 CWT using 4 different thresholding functions.
 
@@ -9,6 +10,7 @@ Control: No denoising
 SQWT: Square-root of log thresholding, constant across all data.
 RIGRSURE: Risk minimalizaiton using Stein's Unbiased Risk Estimate, varies by data
 HEURESURE: Heuristic SURE-based thresholding, combination of bvoth sqwt and rigrsure
+Visushrink: VisuShrink, universal thresholding based on noise variance
 '''
 
 def sqwtolog(detail_coeff):
@@ -57,6 +59,13 @@ def heuresure(detail_coeff):
         return thresh_universal
     else:
         return min(thresh_universal, thresh_sure)
+    
+
+def visushrink(detail_coeff):
+    coeff_flat = detail_coeff.flatten()
+    sigma = np.median(np.abs(coeff_flat)) / 0.6745
+    threshold = sigma * np.sqrt(2 * np.log(len(coeff_flat)))
+    return threshold
 
 def cwt_denoising(data, wavelet="morl", scales=None, threshold_func=sqwtolog, 
                   threshold_type='scale_dependent', mode='soft'):
