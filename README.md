@@ -40,7 +40,7 @@ Scalogram:
 RIGRSURE: 
 f1 accuracy: 0.9791
 Scalogram:
-![RIGRSURE Confusion Matrix](results_12_09_25/confusion_matrix_sqwtolog.png)
+![RIGRSURE Confusion Matrix](results_12_09_25/confusion_matrix_rigrsure.png)
 
 HEURSURE: 
 f1 accuracy: 0.9661
