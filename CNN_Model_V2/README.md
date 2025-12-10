@@ -17,11 +17,18 @@ Training History
 ![CNN Training History](results/training_history.png)
 Ultimately our model learned the parameters:
 Learned Wavelet Parameters:
-  Centre Frequency: 6.223094
-  Bandwidth Frequency: 1.025627
-  Denoising Threshold: 0.100738
+
+Centre Frequency: 6.223094
+
+Bandwidth Frequency: 1.025627
+
+Denoising Threshold: 0.100738
 
 Scale Range:
-  Min Scale: 1.047443
-  Max Scale: 65.945869
+
+Min Scale: 1.047443
+
+Max Scale: 65.945869
+
+
 If you would like the specific model weights please email 271296@hkis.edu.hk in order to recieve the .pt file.
