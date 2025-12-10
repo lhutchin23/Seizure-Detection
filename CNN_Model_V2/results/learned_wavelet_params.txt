@@ -1,0 +1,12 @@
+Best Epoch: 5
+Validation Accuracy: 0.9887
+Validation F1 Score: 0.9718
+
+Learned Wavelet Parameters:
+  Centre Frequency: 6.223094
+  Bandwidth Frequency: 1.025627
+  Denoising Threshold: 0.100738
+
+Scale Range:
+  Min Scale: 1.047443
+  Max Scale: 65.945869

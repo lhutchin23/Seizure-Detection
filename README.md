@@ -23,7 +23,7 @@ Relu 4
 2 unit softmax
 
 
-Test run 1: resulting scalograms in results_12_09_25. Ran on 12/09/25, obviously
+Test run 1: resulting scalograms in results_12_09_25. 
 
 Results: 
 
