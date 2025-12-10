@@ -1,33 +1,49 @@
 
 
 Model architecture: 
-conv2D 1
+We used a dropout of 0.3
 
-Batch norm 1
+Conv2D 1
 
-Relu 1
+BatchNorm 1
 
-Maxpool 1
+ReLU 1
 
-conv 2D 2
+MaxPool 1
 
-Batch norm 2
 
-Relu 2
 
-Maxpool 2
+Conv2D 2
+
+BatchNorm 2
+
+ReLU 2
+
+MaxPool 2
+
+
+
+Conv2D 3
+
+BatchNorm 3
+
+ReLU 3
+
+MaxPool 3
+
+
+
+Flatten
 
 Dropout 1
 
 FCL 1
 
-Relu 3
+ReLU 4
 
 Dropout 2
 
-Relu 4
-
-2 unit softmax
+FCL 2
 
  
 
@@ -61,4 +77,5 @@ VISURHINK:
 f1 accuracy: 0.9739
 Scalogram: 
 ![VISURHINK Confusion Matrix](results_12_09_25/confusion_matrix_visushrink.png)
+
 
