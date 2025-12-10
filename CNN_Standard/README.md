@@ -2,19 +2,35 @@
 
 Model architecture: 
 conv2D 1
+
 Batch norm 1
+
 Relu 1
+
 Maxpool 1
+
 conv 2D 2
+
 Batch norm 2
+
 Relu 2
+
 Maxpool 2
+
 Dropout 1
+
 FCL 1
+
 Relu 3
+
 Dropout 2
+
 Relu 4
+
 2 unit softmax
+
+ 
+
 
 
 Test run 1: resulting scalograms in results_12_09_25. 
@@ -45,3 +61,4 @@ VISURHINK:
 f1 accuracy: 0.9739
 Scalogram: 
 ![VISURHINK Confusion Matrix](results_12_09_25/confusion_matrix_visushrink.png)
+
