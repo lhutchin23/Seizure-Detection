@@ -8,13 +8,13 @@ The accuracy of training 20 Epochs is compiled and the results are down here:
 
 Confusion Matrix
 
-![CNN Denosie Confusion Matrix](CNN_Model_V2/results/confusion_matrix_best_epoch.png)
+![CNN Denosie Confusion Matrix](results/confusion_matrix_best_epoch.png)
 
 F1 Metric
 
 ![CNN F1 Metric Matrix](results/f1_metrics_best_epoch.png)
 Training History
-![CNN Training History](CNN_Model_V2/results/training_history.png)
+![CNN Training History](results/training_history.png)
 Ultimately our model learned the parameters:
 Learned Wavelet Parameters:
   Centre Frequency: 6.223094
