@@ -22,32 +22,26 @@ Learnable parameters
 Denoising Threshold (we do soft denoising), Scales, Centre_freq, and Bandwith_freq
 
 # Standard CNN Model
-conv2D 1
+We used a dropout of 0.3
 
-Batch norm 1
+Conv2D 1
+BatchNorm 1
+ReLU 1
+MaxPool 1
 
-Relu 1
+Conv2D 2
+BatchNorm 2
+ReLU 2
+MaxPool 2
 
-Maxpool 1
+Conv2D 3
+BatchNorm 3
+ReLU 3
+MaxPool 3
 
-conv 2D 2
-
-Batch norm 2
-
-Relu 2
-
-Maxpool 2
-
+Flatten
 Dropout 1
-
 FCL 1
-
-Relu 3
-
+ReLU 4
 Dropout 2
-
-Relu 4
-
-2 unit softmax
-
- 
+FCL 2
