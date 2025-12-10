@@ -25,23 +25,43 @@ Denoising Threshold (we do soft denoising), Scales, Centre_freq, and Bandwith_fr
 We used a dropout of 0.3
 
 Conv2D 1
+
 BatchNorm 1
+
 ReLU 1
+
 MaxPool 1
 
+
+
 Conv2D 2
+
 BatchNorm 2
+
 ReLU 2
+
 MaxPool 2
 
+
+
 Conv2D 3
+
 BatchNorm 3
+
 ReLU 3
+
 MaxPool 3
 
+
+
 Flatten
+
 Dropout 1
+
 FCL 1
+
 ReLU 4
+
 Dropout 2
+
 FCL 2
