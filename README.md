@@ -12,11 +12,17 @@ Ultimately we achieved a 98.87% accuracy using a custom CNN model which incorpor
 # Purpose
 The purpose of this project is to compare the impacts of different levels of wavelet denoising on the accuracy of a standard CNN.
 We compared:
+
 RigrSure
+
 VisuShrink
+
 HeureSure
+
 Sqtwolog
+
 No thresholding
+
 Additionally we also incorporated a learnable wavelet denoising layer with the morlet wavelet as our basis:
 Learnable parameters
 Denoising Threshold (we do soft denoising), Scales, Centre_freq, and Bandwith_freq
