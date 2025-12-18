@@ -7,5 +7,5 @@ else:
     print("No CUDA detected, running on CPU")
 
 
-#lmao you can use this to test whether your computer has a GPU or not, apparently mine didn't. 
+
 
